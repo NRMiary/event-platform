@@ -9,14 +9,9 @@ require_once __DIR__ . '/utils/functions.php';
 $pdo = dbConnect();
 
 // Exécute directement une requête pour récupérer les informations des événements
-// - id : identifiant de l'événement
-// - title : titre de l'événement
-// - date_event : date de l'événement
-// - location : lieu de l'événement
-// - image : chemin ou URL de l'image associée à l'événement
 // Les résultats sont triés par date croissante (du plus ancien au plus récent)
 $stmt = $pdo->query(
-    'SELECT id, title, date_event, location, image 
+    'SELECT id, title, date_event, description, location, image 
      FROM events 
      ORDER BY date_event ASC'
 );
