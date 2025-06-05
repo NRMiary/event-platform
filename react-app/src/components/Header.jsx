@@ -7,7 +7,7 @@ export default function Header() {
       <div className="container">
         <div className="header-inner">
           <Link to="/" className="logo-link">
-            AppEvent
+            <img src="/images/logo-app-events.png" className="logo-small" />
           </Link>
           <nav>
             <Link to="/" style={{ color: '#fff', margin: '0 10px' }}>Accueil</Link>

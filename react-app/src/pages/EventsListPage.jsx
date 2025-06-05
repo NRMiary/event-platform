@@ -65,13 +65,16 @@ export default function EventsListPage() {
 
   return (
     <>
-      <div style={{ marginTop: '60px' }} />
-
       <div className="events-list-page">
 
         {/* Formulaire de filtres */}
         <form className="events-search" onSubmit={handleSubmit}>
           <div className="container">
+            <div className="row">
+                <div className="next-events-section-header" style={{ textAlign: 'center' }}>
+                    <h2 className="entry-title">Listes des événements</h2>
+                </div>
+            </div>
             <div className="row">
               <div className="col-12 col-md-3">
                 <input

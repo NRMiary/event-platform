@@ -1,35 +1,29 @@
 <?php
 declare(strict_types=1);
 
-// Inclut le fichier contenant les fonctions utilitaires (dbConnect, sendJson, etc.)
+// Désactive l’affichage des erreurs à l’écran
+ini_set('display_errors', '0');
+ini_set('display_startup_errors', '0');
+
+// Inclut la fonction sendJson() et dbConnect()
 require_once __DIR__ . '/utils/functions.php';
 
-// Vérifie que le paramètre "id" est présent dans l'URL et qu'il s'agit d'un nombre
+// Vérifie que $_GET['id'] est présent et numérique
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
-    // Envoie une réponse JSON avec un message d'erreur et le code HTTP 400 (Bad Request)
     sendJson(['error' => 'ID manquant ou invalide'], 400);
 }
 
-// Convertit la valeur de l'id en entier pour éviter les injections SQL et autres problèmes
 $eventId = (int) $_GET['id'];
+$pdo     = dbConnect();
 
-// Établit une connexion à la base de données en utilisant PDO
-$pdo = dbConnect();
-
-// Prépare la requête SQL pour récupérer l'événement correspondant à l'id fourni
+// Récupère l’événement
 $stmt = $pdo->prepare('SELECT * FROM events WHERE id = :id');
-
-// Exécute la requête en liant le paramètre :id à la variable $eventId
 $stmt->execute([':id' => $eventId]);
-
-// Récupère le résultat de la requête (un tableau associatif représentant l'événement)
 $event = $stmt->fetch();
 
-// Si aucun événement n'a été trouvé avec cet id, on renvoie une erreur 404
 if (!$event) {
-    // Envoie une réponse JSON avec un message d'erreur et le code HTTP 404 (Not Found)
     sendJson(['error' => 'Événement non trouvé'], 404);
 }
 
-// Si l'événement existe, on renvoie ses données au format JSON (code HTTP 200 par défaut)
+// Envoie les données JSON de l’événement (200 OK)
 sendJson($event);

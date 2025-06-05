@@ -1,56 +1,52 @@
 <?php
 declare(strict_types=1);
 
-// Inclut le fichier contenant les fonctions utilitaires (dbConnect, sendJson, etc.)
+// Désactive l’affichage des erreurs
+ini_set('display_errors', '0');
+ini_set('display_startup_errors', '0');
+
+// Inclut sendJson() et dbConnect()
 require_once __DIR__ . '/utils/functions.php';
 
-// Récupère le contenu brut de la requête (format JSON) et le décode en tableau associatif
+// Lit et décode le JSON du client
 $input = json_decode(file_get_contents('php://input'), true);
 
-// Vérifie que tous les champs requis sont présents dans les données reçues
+// Vérifie que les champs requis sont présents
 if (
-    empty($input['event_id']) ||   // ID de l'événement
-    empty($input['firstname']) ||  // Prénom du participant
-    empty($input['lastname']) ||   // Nom du participant
-    empty($input['email'])         // Email du participant
+    empty($input['event_id']) ||
+    empty($input['name']) ||
+    empty($input['email'])
 ) {
-    // Envoie une réponse JSON avec un message d'erreur et le code HTTP 400 (Bad Request)
     sendJson(['error' => 'Données manquantes'], 400);
 }
 
-// Convertit l'ID de l'événement en entier pour éviter les injections et valider le type
-$eventId = (int) $input['event_id'];
-// Nettoie les champs texte en supprimant les espaces superflus
-$first   = trim($input['firstname']);
-$last    = trim($input['lastname']);
-// Nettoie et valide l'adresse e-mail au format correct
-$email   = filter_var(trim($input['email']), FILTER_VALIDATE_EMAIL);
+$eventId  = (int) $input['event_id'];
+$fullName = trim($input['name']);
+$email    = filter_var(trim($input['email']), FILTER_VALIDATE_EMAIL);
+$message  = isset($input['message']) ? trim($input['message']) : '';
 
-// Si l’email n’est pas valide (filter_var renvoie false), on renvoie une erreur
 if (!$email) {
-    // Envoie une réponse JSON avec un message d'erreur et le code HTTP 400 (Bad Request)
     sendJson(['error' => 'E-mail invalide'], 400);
 }
 
-// Établit une connexion à la base de données via PDO
 $pdo = dbConnect();
 
-// Prépare la requête SQL pour insérer une nouvelle inscription dans la table "registrations"
-$stmt = $pdo->prepare("
-    INSERT INTO registrations (event_id, firstname, lastname, email, created_at)
-    VALUES (:event_id, :firstname, :lastname, :email, NOW())
-");
-
-// Exécute la requête en liant les paramètres aux variables correspondantes
-$stmt->execute([
-    ':event_id'  => $eventId,
-    ':firstname' => $first,
-    ':lastname'  => $last,
-    ':email'     => $email,
-]);
-
-// Envoie une réponse JSON confirmant l'enregistrement de l’inscription (code HTTP 200 par défaut)
-sendJson([
-    'success' => true,
-    'message' => 'Inscription enregistrée'
-]);
+try {
+    $stmt = $pdo->prepare("
+        INSERT INTO registrations (event_id, name, email, message, created_at)
+        VALUES (:event_id, :name, :email, :message, NOW())
+    ");
+    $stmt->execute([
+        ':event_id' => $eventId,
+        ':name'     => $fullName,
+        ':email'    => $email,
+        ':message'  => $message,
+    ]);
+    sendJson([
+        'success' => true,
+        'message' => 'Inscription enregistrée'
+    ]);
+} catch (PDOException $e) {
+    // Ne pas renvoyer l’exception en clair, juste un message général
+    sendJson(['error' => 'Erreur interne, impossible d’enregistrer'], 500);
+}

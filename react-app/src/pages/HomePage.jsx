@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import NewsletterForm from '../components/NewsletterForm';
 import { Link } from 'react-router-dom';
 import HeroSlider from '../components/HeroSlider';
 
@@ -104,9 +103,6 @@ export default function HomePage() {
 
       {/* Marge avant la newsletter */}
       <div style={{ marginTop: '50px' }} />
-
-      {/* Newsletter */}
-      <NewsletterForm />
     </>
   );
 }
