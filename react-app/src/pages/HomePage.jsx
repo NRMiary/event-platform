@@ -30,8 +30,6 @@ export default function HomePage() {
 
   return (
     <>
-      {/* Espace pour compenser le header fixe (ajouté dans App.jsx) */}
-      {/* Si vous avez déjà ajouté marginTop dans App.jsx, vous pouvez retirer cette div */}
       <HeroSlider />
 
       {/* Section “Découvrez nos prochains événements” */}

@@ -12,7 +12,6 @@ export default function Header() {
           <nav>
             <Link to="/" style={{ color: '#fff', margin: '0 10px' }}>Accueil</Link>
             <Link to="/events" style={{ color: '#fff', margin: '0 10px' }}>Événements</Link>
-            <Link to="/register" style={{ color: '#fff', margin: '0 10px' }}>Inscription</Link>
           </nav>
         </div>
       </div>

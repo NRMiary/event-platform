@@ -10,7 +10,6 @@ export default function Footer() {
               <ul className="flex flex-wrap justify-content-center align-items-center">
                 <li><a href="/">Accueil</a></li>
                 <li><a href="/events">Événements</a></li>
-                <li><a href="#contact">Inscription</a></li>
               </ul>
             </nav>
             <div className="text-center mt-3">

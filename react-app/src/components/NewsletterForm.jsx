@@ -30,7 +30,7 @@ export default function NewsletterForm() {
           <div className="col-12">
             <header className="entry-header">
               <h2 className="entry-title">
-                Abonnez-vous à notre newsletter pour recevoir les dernières tendances et actualités
+                Abonnez-vous à notre newsletter pour recevoir les dernières actualités
               </h2>
               <p>Rejoignez notre base de données MAINTENANT !</p>
             </header>
