@@ -18,6 +18,10 @@ export default function RegistrationPage() {
 
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState(null);
+  const API_BASE_URL = window.location.hostname.includes('localhost')
+  ? 'http://localhost:8000'
+  : import.meta.env.VITE_API_BASE_URL;
+
 
   // Charger les détails de l'événement
   useEffect(() => {
@@ -27,7 +31,7 @@ export default function RegistrationPage() {
       return;
     }
 
-    fetch(`http://localhost:8000/events/detail?id=${eventId}`)
+    fetch(`${API_BASE_URL}/event_detail.php?id=${eventId}`)
       .then(res => {
         if (!res.ok) throw new Error('Événement introuvable');
         return res.json();
@@ -55,7 +59,7 @@ export default function RegistrationPage() {
       message: message.trim(),
     };
 
-    fetch('http://localhost:8000/events/register', {
+    fetch(`${API_BASE_URL}/events/register.php`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),

@@ -3,10 +3,13 @@ import React, { useState } from 'react';
 export default function NewsletterForm() {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState(null);
+  const API_BASE_URL = window.location.hostname.includes('localhost')
+  ? 'http://localhost:8000'
+  : import.meta.env.VITE_API_BASE_URL;
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    fetch('http://localhost:8000/newsletter/subscribe', {
+    fetch(`${API_BASE_URL}/newsletter.php/subscribe`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email }),

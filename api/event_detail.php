@@ -1,10 +1,6 @@
 <?php
 declare(strict_types=1);
 
-// Désactive l’affichage des erreurs à l’écran
-ini_set('display_errors', '0');
-ini_set('display_startup_errors', '0');
-
 // Inclut la fonction sendJson() et dbConnect()
 require_once __DIR__ . '/utils/functions.php';
 

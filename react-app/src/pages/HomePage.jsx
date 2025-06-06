@@ -6,9 +6,13 @@ export default function HomePage() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const API_BASE_URL = window.location.hostname.includes('localhost')
+  ? 'http://localhost:8000'
+  : import.meta.env.VITE_API_BASE_URL;
+
 
   useEffect(() => {
-    fetch('http://localhost:8000/events')
+    fetch(`${API_BASE_URL}/events.php`)
       .then((res) => {
         if (!res.ok) throw new Error('Erreur serveur');
         return res.json();
