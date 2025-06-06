@@ -1,6 +1,9 @@
 <?php
 declare(strict_types=1);
 
+header('Access-Control-Allow-Origin: http://localhost:5173');
+
+
 // Désactive l’affichage des erreurs
 ini_set('display_errors', '0');
 ini_set('display_startup_errors', '0');

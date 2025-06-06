@@ -1,6 +1,9 @@
 <?php
 declare(strict_types=1);
 
+header('Access-Control-Allow-Origin: http://localhost:5173');
+
+
 // Inclut la fonction sendJson() et dbConnect()
 require_once __DIR__ . '/utils/functions.php';
 
