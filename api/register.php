@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 header('Access-Control-Allow-Origin: http://localhost:5173');
-
+header('Access-Control-Allow-Origin: https://app-event.netlify.app');
 
 // Désactive l’affichage des erreurs
 ini_set('display_errors', '0');
