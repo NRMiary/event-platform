@@ -1,27 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import axios from 'axios';
 
 export default function RegistrationPage() {
   // Récupérer event_id depuis l’URL : /register?event_id=123
-  const { search } = useLocation();
-  const queryParams = new URLSearchParams(search);
-  const eventId = queryParams.get('event_id');
+  const { search }      = useLocation();
+  const queryParams     = new URLSearchParams(search);
+  const eventId         = queryParams.get('event_id');
 
-  const [event, setEvent] = useState(null);
+  const [event, setEvent]               = useState(null);
   const [loadingEvent, setLoadingEvent] = useState(true);
-  const [errorEvent, setErrorEvent] = useState(null);
+  const [errorEvent, setErrorEvent]     = useState(null);
 
   // États pour le formulaire d'inscription
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
-
+  const [name, setName]           = useState('');
+  const [email, setEmail]         = useState('');
+  const [message, setMessage]     = useState('');
   const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [submitError, setSubmitError] = useState(null);
-  const API_BASE_URL = window.location.hostname.includes('localhost')
-  ? 'http://localhost:8000'
-  : import.meta.env.VITE_API_BASE_URL;
+  const [submitError, setSubmitError]     = useState(null);
 
+  // Base URL selon l’environnement
+  const API_BASE_URL = window.location.hostname.includes('localhost')
+    ? 'http://localhost:8000'
+    : import.meta.env.VITE_API_BASE_URL;
 
   // Charger les détails de l'événement
   useEffect(() => {
@@ -31,54 +32,49 @@ export default function RegistrationPage() {
       return;
     }
 
-    fetch(`${API_BASE_URL}/event_detail.php?id=${eventId}`)
-      .then(res => {
-        if (!res.ok) throw new Error('Événement introuvable');
-        return res.json();
+    axios.get(`${API_BASE_URL}/events/detail`, {
+        params: { id: eventId }
       })
-      .then(data => {
-        setEvent(data);
-        setLoadingEvent(false);
+      .then(response => {
+        setEvent(response.data);
       })
       .catch(err => {
         console.error(err);
         setErrorEvent('Impossible de charger les informations de l’événement.');
+      })
+      .finally(() => {
         setLoadingEvent(false);
       });
-  }, [eventId]);
+  }, [API_BASE_URL, eventId]);
 
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault();
     setSubmitError(null);
+    setSubmitSuccess(false);
 
-    // Corps du POST (à adapter selon votre API)
     const payload = {
       event_id: eventId,
-      name: name.trim(),
+      name: name.trim(), 
       email: email.trim(),
-      message: message.trim(),
     };
 
-    fetch(`${API_BASE_URL}/events/register.php`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    })
-      .then(res => {
-        if (!res.ok) throw new Error('Erreur lors de l’enregistrement');
-        return res.json();
-      })
-      .then(() => {
-        setSubmitSuccess(true);
-        // Réinitialiser le formulaire
-        setName('');
-        setEmail('');
-        setMessage('');
-      })
-      .catch(err => {
-        console.error(err);
-        setSubmitError('Une erreur est survenue lors de l’inscription.');
-      });
+    try {
+      const res = await axios.post(
+        `${API_BASE_URL}/events/register`,
+        payload
+      );
+      setSubmitSuccess(true);
+      // reset form
+      setName('');
+      setEmail('');
+      setMessage('');
+    } catch (err) {
+      console.error(err);
+      setSubmitError(
+        err.response?.data?.error ||
+        'Une erreur est survenue lors de l’inscription.'
+      );
+    }
   };
 
   return (
@@ -87,14 +83,13 @@ export default function RegistrationPage() {
       <div style={{ marginTop: '60px' }} />
 
       <div className="contact-page">
-        {/* En-tête de la page */}
-
         <div className="container" style={{ marginTop: '40px', marginBottom: '60px' }}>
           <div className="row">
             <div className="next-events-section-header" style={{ textAlign: 'center' }}>
               <h2 className="entry-title">Inscription pour cet événement</h2>
             </div>
           </div>
+
           {loadingEvent && (
             <div className="row">
               <div className="col-12 text-center">
@@ -113,7 +108,6 @@ export default function RegistrationPage() {
 
           {!loadingEvent && !errorEvent && event && (
             <>
-              {/* Section d’affichage des informations de l’événement */}
               <div className="row">
                 <div className="col-12 col-md-6">
                   <img
@@ -124,7 +118,9 @@ export default function RegistrationPage() {
                 </div>
                 <div className="col-12 col-md-6">
                   <h2 className="entry-title">{event.title}</h2>
-                  <p style={{ marginTop: '16px', lineHeight: '1.6' }}>{event.description}</p>
+                  <p style={{ marginTop: '16px', lineHeight: '1.6' }}>
+                    {event.description}
+                  </p>
                   <p style={{ marginTop: '12px', fontStyle: 'italic' }}>
                     Date :{' '}
                     {new Date(event.date_event).toLocaleDateString('fr-FR', {
@@ -140,7 +136,6 @@ export default function RegistrationPage() {
                 </div>
               </div>
 
-              {/* Formulaire d'inscription */}
               <div className="row" style={{ marginTop: '40px' }}>
                 <div className="col-12 col-md-8 offset-md-2">
                   <div className="contact-form">

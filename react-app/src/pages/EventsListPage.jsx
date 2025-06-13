@@ -1,38 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 export default function EventsListPage() {
-  const [events, setEvents] = useState([]);
+  const [events, setEvents]               = useState([]);
   const [filteredEvents, setFilteredEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const API_BASE_URL = window.location.hostname.includes('localhost')
-  ? 'http://localhost:8000'
-  : import.meta.env.VITE_API_BASE_URL;
+  const [loading, setLoading]             = useState(true);
+  const [error, setError]                 = useState(null);
 
+  // Détection de l'URL de base en dev vs prod
+  const API_BASE_URL = window.location.hostname.includes('localhost')
+    ? 'http://localhost:8000'
+    : import.meta.env.VITE_API_BASE_URL;
 
   // États pour les filtres
-  const [dateFilter, setDateFilter] = useState('');
-  const [nameFilter, setNameFilter] = useState('');
+  const [dateFilter, setDateFilter]       = useState('');
+  const [nameFilter, setNameFilter]       = useState('');
   const [locationFilter, setLocationFilter] = useState('');
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/events.php`)
+    axios.get(`${API_BASE_URL}/events.php`)
       .then(res => {
-        if (!res.ok) throw new Error('Erreur serveur');
-        return res.json();
-      })
-      .then(data => {
-        setEvents(data);
-        setFilteredEvents(data);
-        setLoading(false);
+        setEvents(res.data);
+        setFilteredEvents(res.data);
       })
       .catch(err => {
         console.error(err);
         setError('Impossible de charger les événements.');
+      })
+      .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [API_BASE_URL]);
 
   // Applique les filtres au tableau d'événements
   const applyFilters = () => {
@@ -40,28 +39,32 @@ export default function EventsListPage() {
 
     if (dateFilter) {
       filtered = filtered.filter(evt => {
-        // on compare uniquement la partie date (YYYY-MM-DD)
-        const evtDate = new Date(evt.date_event).toISOString().slice(0, 10);
+        const evtDate = new Date(evt.date_event)
+          .toISOString()
+          .slice(0, 10);
         return evtDate === dateFilter;
       });
     }
 
     if (nameFilter.trim()) {
       filtered = filtered.filter(evt =>
-        evt.title.toLowerCase().includes(nameFilter.trim().toLowerCase())
+        evt.title
+           .toLowerCase()
+           .includes(nameFilter.trim().toLowerCase())
       );
     }
 
     if (locationFilter.trim()) {
       filtered = filtered.filter(evt =>
-        evt.location.toLowerCase().includes(locationFilter.trim().toLowerCase())
+        evt.location
+           .toLowerCase()
+           .includes(locationFilter.trim().toLowerCase())
       );
     }
 
     setFilteredEvents(filtered);
   };
 
-  // Gestion du clic sur "Rechercher"
   const handleSubmit = e => {
     e.preventDefault();
     applyFilters();
@@ -75,10 +78,11 @@ export default function EventsListPage() {
         <form className="events-search" onSubmit={handleSubmit}>
           <div className="container">
             <div className="row">
-                <div className="next-events-section-header" style={{ textAlign: 'center' }}>
-                    <h2 className="entry-title">Listes des événements</h2>
-                </div>
+              <div className="next-events-section-header" style={{ textAlign: 'center' }}>
+                <h2 className="entry-title">Listes des événements</h2>
+              </div>
             </div>
+
             <div className="row">
               <div className="col-12 col-md-3">
                 <input
@@ -182,7 +186,6 @@ export default function EventsListPage() {
           )}
         </div>
       </div>
-
     </>
   );
 }

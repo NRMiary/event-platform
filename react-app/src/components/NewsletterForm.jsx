@@ -1,29 +1,34 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
 export default function NewsletterForm() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail]   = useState('');
   const [status, setStatus] = useState(null);
-  const API_BASE_URL = window.location.hostname.includes('localhost')
-  ? 'http://localhost:8000'
-  : import.meta.env.VITE_API_BASE_URL;
 
-  const handleSubmit = (e) => {
+  const API_BASE_URL = window.location.hostname.includes('localhost')
+    ? 'http://localhost:8000'
+    : import.meta.env.VITE_API_BASE_URL;
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    fetch(`${API_BASE_URL}/newsletter.php/subscribe`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) {
-          setStatus('Merci pour votre inscription !');
-          setEmail('');
-        } else {
-          setStatus(data.error || 'Erreur lors de l’inscription');
-        }
-      })
-      .catch(() => setStatus('Erreur réseau'));
+    setStatus(null);
+
+    try {
+      const res = await axios.post(
+        `${API_BASE_URL}/newsletter/subscribe`,
+        { email },
+        { headers: { 'Content-Type': 'application/json' } }
+      );
+      if (res.data.success) {
+        setStatus('Merci pour votre inscription !');
+        setEmail('');
+      } else {
+        setStatus(res.data.error || 'Erreur lors de l’inscription');
+      }
+    } catch (err) {
+      console.error(err);
+      setStatus('Erreur réseau');
+    }
   };
 
   return (

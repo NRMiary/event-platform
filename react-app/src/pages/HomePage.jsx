@@ -1,35 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import HeroSlider from '../components/HeroSlider';
 
 export default function HomePage() {
-  const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const API_BASE_URL = window.location.hostname.includes('localhost')
-  ? 'http://localhost:8000'
-  : import.meta.env.VITE_API_BASE_URL;
+  const [events, setEvents]     = useState([]);
+  const [loading, setLoading]   = useState(true);
+  const [error, setError]       = useState(null);
 
+  const API_BASE_URL = window.location.hostname.includes('localhost')
+    ? 'http://localhost:8000'
+    : import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/events.php`)
-      .then((res) => {
-        if (!res.ok) throw new Error('Erreur serveur');
-        return res.json();
-      })
-      .then((data) => {
+    axios.get(`${API_BASE_URL}/events.php`)
+      .then((response) => {
         // On affiche uniquement les événements futurs
+        const data = response.data;
         const today = new Date();
-        const upcoming = data.filter((evt) => new Date(evt.date_event) >= today);
+        const upcoming = data.filter(evt => new Date(evt.date_event) >= today);
         setEvents(upcoming);
-        setLoading(false);
       })
       .catch((err) => {
         console.error(err);
         setError('Impossible de charger les événements.');
+      })
+      .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [API_BASE_URL]);
 
   return (
     <>
@@ -71,7 +70,7 @@ export default function HomePage() {
 
           {!loading && !error && events.length > 0 && (
             <div className="row">
-              {events.map((evt) => (
+              {events.map(evt => (
                 <div key={evt.id} className="col-12 col-sm-6 col-md-4">
                   <div className="next-event-wrap">
                     <figure>
