@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-header('Access-Control-Allow-Origin: http://localhost:5173');
+header('Access-Control-Allow-Origin: https://app-event.netlify.app');
 
 // Inclut le fichier contenant les fonctions utilitaires (dbConnect, sendJson, etc.)
 require_once __DIR__ . '/utils/functions.php';

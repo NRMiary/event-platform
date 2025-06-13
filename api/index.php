@@ -6,7 +6,7 @@ ini_set('display_errors', '0');
 ini_set('display_startup_errors', '0');
 
 // En-têtes CORS
-header('Access-Control-Allow-Origin: http://localhost:5173');
+header('Access-Control-Allow-Origin: https://app-event.netlify.app');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 // Gérer le pré-vol (OPTIONS)
